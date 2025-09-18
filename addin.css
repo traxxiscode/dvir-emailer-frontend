@@ -56,3 +56,176 @@
     margin-bottom: 1rem;
     opacity: 0.5;
 }
+
+/* Enhanced styling */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-bottom: 3px solid var(--primary-color);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #a8d8ea 100%);
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 2px solid var(--primary-color);
+    font-size: 1.1em;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 140, 0, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #ff7700 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #e67e00 0%, #ff6600 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
+}
+
+.recipient-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.recipient-item:hover {
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(255, 140, 0, 0.15);
+}
+
+.badge {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #ff7700 100%) !important;
+    border-radius: 12px;
+    padding: 0.5em 0.8em;
+}
+
+.empty-state {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-outline-danger:hover {
+    transform: scale(1.05);
+}
+
+.btn-outline-dark {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-dark:hover {
+    transform: translateY(-1px);
+}
+
+/* Animation for alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status indicators */
+.fas.fa-circle.text-success {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Improved form styling */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-text {
+    font-size: 0.85em;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* Enhanced recipient settings display */
+.recipient-settings {
+    background-color: rgba(255, 140, 0, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+}
+
+/* Container improvements */
+.container {
+    max-width: 1200px;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .recipient-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .recipient-item button {
+        margin-top: 0.5rem;
+        align-self: flex-end;
+    }
+}

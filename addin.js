@@ -135,7 +135,7 @@ geotab.addin.dvirEmailer = function () {
                 const newRecipient = {
                     email: email,
                     defect_filter: defectFilter,
-                    added_at: firebase.firestore.FieldValue.serverTimestamp()
+                    added_at: new Date().toISOString()
                 };
                 
                 recipients.push(newRecipient);
@@ -143,7 +143,7 @@ geotab.addin.dvirEmailer = function () {
                 // Update document
                 await doc.ref.update({
                     recipients: recipients,
-                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    updated_at: new Date().toISOString()
                 });
                 
                 showAlert(`Successfully added ${email} to recipient list`, 'success');
@@ -282,28 +282,6 @@ geotab.addin.dvirEmailer = function () {
             }
         }, 5000);
     }
-
-    /**
-     * Test connection to Firestore
-     */
-    window.testConnection = async function() {
-        try {
-            showAlert('Testing connection...', 'info');
-            
-            if (!window.db) {
-                showAlert('Firestore not initialized', 'danger');
-                return;
-            }
-            
-            // Try to read from the collection
-            const snapshot = await window.db.collection('dvir_configurations').limit(1).get();
-            showAlert('Connection test successful', 'success');
-            
-        } catch (error) {
-            console.error('Connection test failed:', error);
-            showAlert('Connection test failed: ' + error.message, 'danger');
-        }
-    };
 
     /**
      * Confirm recipient removal
