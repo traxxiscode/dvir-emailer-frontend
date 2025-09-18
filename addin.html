@@ -2,152 +2,158 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DVIR Email Manager</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DVIR Emailer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Custom CSS -->
     <link href="addin.css" rel="stylesheet">
-
+    <script src="addin.js"></script>
 </head>
 <body>
     <div id="dvirEmailer" style="display: none;">
-        <div class="main-container">
-            <!-- Alert Container -->
-            <div id="alertContainer"></div>
-            
-            <!-- Header -->
-            <div class="header-card">
-                <img src="https://traxxisgps.com/wp-content/uploads/elementor/thumbs/Traxxis-refresh-logo_horizontal-min-1-qjgvd5cr9kxu5eay6trn10pbylz31ardqnqdluuew0.webp" 
-                     alt="Company Logo" class="logo">
-                <h1 class="header-title">DVIR Email Manager</h1>
-                <p class="header-subtitle">Manage email recipients and settings for DVIR defect notifications</p>
-            </div>
-            
-            <!-- Database Info -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="stats-card">
-                        <div class="stats-number" id="databaseName">Loading...</div>
-                        <div class="stats-label">Current Database</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="stats-card">
-                        <div class="stats-number" id="recipientCount">0</div>
-                        <div class="stats-label">Active Recipients</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Settings Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-cogs me-2"></i>Email Settings
-                </div>
-                <div class="card-body">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="onlyNewDefectsSwitch" checked>
-                        <label class="form-check-label" for="onlyNewDefectsSwitch">
-                            <strong>Send only new defects</strong>
-                            <small class="d-block text-muted">When enabled, only defects reported within 10 minutes of the DVIR log creation are sent</small>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Add Recipient Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-plus me-2"></i>Add Email Recipient
-                </div>
-                <div class="card-body">
-                    <form id="addRecipientForm">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <input type="email" class="form-control" id="emailInput" 
-                                       placeholder="Enter email address" required>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-plus me-1"></i>Add Recipient
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Current Recipients Card -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-users me-2"></i>Current Recipients</span>
-                    <button class="btn btn-outline-primary btn-sm" onclick="refreshRecipients()">
-                        <i class="fas fa-refresh me-1"></i>Refresh
+        <!-- Navigation/Header -->
+        <nav class="navbar navbar-expand-lg" style="background-color: var(--secondary-color);">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="https://traxxisgps.com/wp-content/uploads/elementor/thumbs/Traxxis-refresh-logo_horizontal-min-1-qjgvd5cr9kxu5eay6trn10pbylz31ardqnqdluuew0.webp" alt="Company Logo" class="me-2">
+                    DVIR Emailer
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <button class="btn btn-outline-dark btn-sm" onclick="testConnection()">
+                        <i class="fas fa-plug"></i> Test Connection
                     </button>
                 </div>
-                <div class="card-body">
-                    <div id="recipientsList">
-                        <div class="empty-state">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <h5>Loading recipients...</h5>
+            </div>
+        </nav>
+
+        <!-- Alert Container -->
+        <div id="alertContainer" class="container mt-3"></div>
+
+        <div class="container mt-4">
+            <div class="row">
+                <!-- Add Recipients Section -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Add Email Recipients
+                        </div>
+                        <div class="card-body">
+                            <form id="addRecipientForm">
+                                <div class="mb-3">
+                                    <label for="recipientEmail" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="recipientEmail" required>
+                                    <div class="form-text">Enter a valid email address to receive DVIR notifications</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Defect Filter</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="defectFilter" id="newDefectsOnly" value="new" checked>
+                                        <label class="form-check-label" for="newDefectsOnly">
+                                            New Defects Only (Recommended)
+                                        </label>
+                                        <div class="form-text">Only send emails for newly reported defects</div>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="defectFilter" id="allDefects" value="all">
+                                        <label class="form-check-label" for="allDefects">
+                                            All Defects
+                                        </label>
+                                        <div class="form-text">Send emails for all defects, regardless of age</div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add Recipient
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Recipients Section -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-users me-2"></i>
+                                Current Recipients
+                                <span id="recipientCount" class="badge bg-secondary ms-2">0</span>
+                            </span>
+                            <button class="btn btn-outline-dark btn-sm" onclick="refreshRecipients()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="recipientsList">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No recipients configured</p>
+                                    <small>Add email addresses to start receiving DVIR notifications</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Actions Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-tools me-2"></i>Actions
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <button class="btn btn-outline-primary w-100" onclick="testEmailSystem()">
-                                <i class="fas fa-envelope-open-text me-1"></i>Test Email System
-                            </button>
+
+            <!-- Status Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Service Status & Information
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <button class="btn btn-outline-primary w-100" onclick="exportSettings()">
-                                <i class="fas fa-download me-1"></i>Export Settings
-                            </button>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Current Database:</h6>
+                                    <p id="currentDatabase" class="fw-bold text-primary">Loading...</p>
+                                    
+                                    <h6>Service Status:</h6>
+                                    <p id="serviceStatus" class="fw-bold">
+                                        <i class="fas fa-circle text-success"></i> Active
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>How it works:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Automatic monitoring every 10 minutes</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Sends separate emails per driver</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Includes asset information and location</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Links directly to MyGeotab DVIR</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase configuration - Replace with your config
+        // Firebase configuration (you'll need to replace with your actual config)
         const firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "your-app-id"
+        apiKey: "AIzaSyCdf2Z7hiDj9s30aPxO64gLRVPUvSwQ3CU",
+        authDomain: "dviremailer.firebaseapp.com",
+        projectId: "dviremailer",
+        storageBucket: "dviremailer.firebasestorage.app",
+        messagingSenderId: "34151014900",
+        appId: "1:34151014900:web:3a707cb923a353221219a1"
         };
         
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.firestore();
     </script>
-    
-    <!-- Add-in Script -->
-    <script src="addin.js"></script>
 </body>
 </html>
