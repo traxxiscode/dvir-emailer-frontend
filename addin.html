@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVIR Email Manager</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Custom CSS -->
+    <link href="addin.css" rel="stylesheet">
+
+</head>
+<body>
+    <div id="dvirEmailer" style="display: none;">
+        <div class="main-container">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+            
+            <!-- Header -->
+            <div class="header-card">
+                <img src="https://traxxisgps.com/wp-content/uploads/elementor/thumbs/Traxxis-refresh-logo_horizontal-min-1-qjgvd5cr9kxu5eay6trn10pbylz31ardqnqdluuew0.webp" 
+                     alt="Company Logo" class="logo">
+                <h1 class="header-title">DVIR Email Manager</h1>
+                <p class="header-subtitle">Manage email recipients and settings for DVIR defect notifications</p>
+            </div>
+            
+            <!-- Database Info -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="stats-card">
+                        <div class="stats-number" id="databaseName">Loading...</div>
+                        <div class="stats-label">Current Database</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stats-card">
+                        <div class="stats-number" id="recipientCount">0</div>
+                        <div class="stats-label">Active Recipients</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cogs me-2"></i>Email Settings
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="onlyNewDefectsSwitch" checked>
+                        <label class="form-check-label" for="onlyNewDefectsSwitch">
+                            <strong>Send only new defects</strong>
+                            <small class="d-block text-muted">When enabled, only defects reported within 10 minutes of the DVIR log creation are sent</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Recipient Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-plus me-2"></i>Add Email Recipient
+                </div>
+                <div class="card-body">
+                    <form id="addRecipientForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="email" class="form-control" id="emailInput" 
+                                       placeholder="Enter email address" required>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-plus me-1"></i>Add Recipient
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Current Recipients Card -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-users me-2"></i>Current Recipients</span>
+                    <button class="btn btn-outline-primary btn-sm" onclick="refreshRecipients()">
+                        <i class="fas fa-refresh me-1"></i>Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="recipientsList">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <h5>Loading recipients...</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-tools me-2"></i>Actions
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-outline-primary w-100" onclick="testEmailSystem()">
+                                <i class="fas fa-envelope-open-text me-1"></i>Test Email System
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-outline-primary w-100" onclick="exportSettings()">
+                                <i class="fas fa-download me-1"></i>Export Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Firebase configuration - Replace with your config
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+    </script>
+    
+    <!-- Add-in Script -->
+    <script src="addin.js"></script>
+</body>
+</html>
