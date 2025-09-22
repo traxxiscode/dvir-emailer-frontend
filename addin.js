@@ -183,10 +183,10 @@ geotab.addin.dvirEmailer = function () {
                 // Remove recipient
                 const updatedRecipients = recipients.filter(r => r.email !== email);
                 
-                // Update document
+                // Update document - use consistent timestamp format
                 await doc.ref.update({
                     recipients: updatedRecipients,
-                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    updated_at: new Date().toISOString()
                 });
                 
                 showAlert(`Successfully removed ${email} from recipient list`, 'success');

@@ -1,0 +1,15 @@
+{
+    "name": "DVIR Defect Emailer",
+    "supportEmail": "parker@traxxisgps.com",
+    "version": "1.0",
+    "items": [
+        {
+            "url": "https://traxxiscode.github.io/dvir-emailer-frontend/index.html",
+            "category": "AddIns",
+            "menuName": {
+                "en": "DVIR Defect Emailer"
+            }
+        }
+    ],
+    "isSigned": false
+}
