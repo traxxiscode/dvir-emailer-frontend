@@ -75,11 +75,46 @@ geotab.addin.dvirEmailer = function () {
     }
 
     /**
-     * Load recipients for current database
+     * Show loading state for buttons
      */
+    function setButtonLoading(buttonId, loading = true) {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        
+        if (loading) {
+            button.classList.add('loading');
+            button.disabled = true;
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+    }
+
+    /**
+     * Hide initial loading overlay
+     */
+    function hideInitialLoading() {
+        const overlay = document.getElementById('initialLoadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    /**
+     * Show initial loading overlay
+     */
+    function showInitialLoading() {
+        const overlay = document.getElementById('initialLoadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+        }
+    }
+
+    // Modify your existing loadRecipients function:
     async function loadRecipients() {
         if (!currentDatabase || !window.db) {
             showAlert('Database not initialized', 'danger');
+            hideInitialLoading();
             return;
         }
 
@@ -102,17 +137,21 @@ geotab.addin.dvirEmailer = function () {
         } catch (error) {
             console.error('Error loading recipients:', error);
             showAlert('Error loading recipients: ' + error.message, 'danger');
+            renderRecipients([]);
+            updateRecipientCount(0);
+        } finally {
+            hideInitialLoading();
         }
     }
 
-    /**
-     * Add recipient to database
-     */
+    // Modify your existing addRecipient function:
     async function addRecipient(email, defectFilter) {
         if (!currentDatabase || !window.db) {
             showAlert('Database not initialized', 'danger');
             return;
         }
+
+        setButtonLoading('addRecipientBtn', true);
 
         try {
             const querySnapshot = await window.db.collection('dvir_configurations')
@@ -151,6 +190,8 @@ geotab.addin.dvirEmailer = function () {
                 
                 // Clear form
                 document.getElementById('addRecipientForm').reset();
+                // Reset to default radio button
+                document.getElementById('newDefectsOnly').checked = true;
                 
             } else {
                 showAlert('Database configuration not found', 'danger');
@@ -158,17 +199,62 @@ geotab.addin.dvirEmailer = function () {
         } catch (error) {
             console.error('Error adding recipient:', error);
             showAlert('Error adding recipient: ' + error.message, 'danger');
+        } finally {
+            setButtonLoading('addRecipientBtn', false);
         }
     }
 
-    /**
-     * Remove recipient from database
-     */
+    // Modify your existing renderRecipients function:
+    function renderRecipients(recipients) {
+        const container = document.getElementById('recipientsList');
+        if (!container) return;
+        
+        if (recipients.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p class="mb-2 fw-bold">No recipients configured</p>
+                    <small>Add email addresses to start receiving DVIR notifications</small>
+                </div>
+            `;
+            return;
+        }
+        
+        const recipientsHtml = recipients.map(recipient => `
+            <div class="recipient-item">
+                <div class="flex-grow-1">
+                    <div class="recipient-email">${recipient.email}</div>
+                    <div class="recipient-settings">
+                        <i class="fas fa-filter me-1"></i>
+                        ${recipient.defect_filter === 'new' ? 'New Defects Only' : 'All Defects'}
+                    </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm btn-loading" onclick="confirmRemoveRecipient('${recipient.email}')" id="remove-${recipient.email.replace(/[^a-zA-Z0-9]/g, '')}">
+                    <span class="btn-text">
+                        <i class="fas fa-trash me-1"></i>Remove
+                    </span>
+                    <span class="btn-loading-text" style="display: none;">
+                        <span class="spinner-border spinner-border-sm me-1" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </span>
+                        Removing...
+                    </span>
+                </button>
+            </div>
+        `).join('');
+        
+        container.innerHTML = recipientsHtml;
+    }
+
+    // Modify your existing removeRecipient function:
     async function removeRecipient(email) {
         if (!currentDatabase || !window.db) {
             showAlert('Database not initialized', 'danger');
             return;
         }
+
+        const buttonId = `remove-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+        setButtonLoading(buttonId, true);
 
         try {
             const querySnapshot = await window.db.collection('dvir_configurations')
@@ -183,7 +269,7 @@ geotab.addin.dvirEmailer = function () {
                 // Remove recipient
                 const updatedRecipients = recipients.filter(r => r.email !== email);
                 
-                // Update document - use consistent timestamp format
+                // Update document
                 await doc.ref.update({
                     recipients: updatedRecipients,
                     updated_at: new Date().toISOString()
@@ -198,43 +284,9 @@ geotab.addin.dvirEmailer = function () {
         } catch (error) {
             console.error('Error removing recipient:', error);
             showAlert('Error removing recipient: ' + error.message, 'danger');
+        } finally {
+            setButtonLoading(buttonId, false);
         }
-    }
-
-    /**
-     * Render recipients list
-     */
-    function renderRecipients(recipients) {
-        const container = document.getElementById('recipientsList');
-        if (!container) return;
-        
-        if (recipients.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-inbox"></i>
-                    <p>No recipients configured</p>
-                    <small>Add email addresses to start receiving DVIR notifications</small>
-                </div>
-            `;
-            return;
-        }
-        
-        const recipientsHtml = recipients.map(recipient => `
-            <div class="recipient-item">
-                <div>
-                    <div class="recipient-email">${recipient.email}</div>
-                    <div class="recipient-settings">
-                        <i class="fas fa-filter me-1"></i>
-                        ${recipient.defect_filter === 'new' ? 'New Defects Only' : 'All Defects'}
-                    </div>
-                </div>
-                <button class="btn btn-outline-danger btn-sm" onclick="confirmRemoveRecipient('${recipient.email}')">
-                    <i class="fas fa-trash"></i> Remove
-                </button>
-            </div>
-        `).join('');
-        
-        container.innerHTML = recipientsHtml;
     }
 
     /**
@@ -296,7 +348,11 @@ geotab.addin.dvirEmailer = function () {
      * Refresh recipients list
      */
     window.refreshRecipients = function() {
-        loadRecipients();
+        setButtonLoading('refreshBtn', true);
+        setTimeout(() => {
+            loadRecipients();
+            setButtonLoading('refreshBtn', false);
+        }, 500); // Small delay to show loading state
     };
 
     /**
@@ -345,6 +401,9 @@ geotab.addin.dvirEmailer = function () {
         focus: function (freshApi, freshState) {
             api = freshApi;
             state = freshState;
+
+            // Show initial loading
+            showInitialLoading();
 
             // Ensure current database is in Firestore
             ensureDatabaseInFirestore();

@@ -12,23 +12,33 @@
 <body>
     <div id="dvirEmailer" style="display: none;">
         <!-- Navigation/Header -->
-        <nav class="navbar navbar-expand-lg" style="background-color: var(--secondary-color);">
+        <div class="navbar navbar-expand-lg custom-header">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="https://traxxisgps.com/wp-content/uploads/elementor/thumbs/Traxxis-refresh-logo_horizontal-min-1-qjgvd5cr9kxu5eay6trn10pbylz31ardqnqdluuew0.webp" alt="Company Logo" class="me-2">
-                    DVIR Emailer
-                </a>
+                <div class="navbar-brand d-flex align-items-center">
+                    <img src="https://traxxisgps.com/wp-content/uploads/elementor/thumbs/Traxxis-refresh-logo_horizontal-min-1-qjgvd5cr9kxu5eay6trn10pbylz31ardqnqdluuew0.webp" alt="Company Logo" class="header-logo me-3">
+                    <span class="header-title">DVIR Emailer</span>
+                </div>
             </div>
-        </nav>
+        </div>
 
         <!-- Alert Container -->
         <div id="alertContainer" class="container mt-3"></div>
+
+        <!-- Loading Overlay for Initial Load -->
+        <div id="initialLoadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="mt-3 h5">Loading recipients...</div>
+            </div>
+        </div>
 
         <div class="container mt-4">
             <div class="row">
                 <!-- Add Recipients Section -->
                 <div class="col-lg-6 mb-4">
-                    <div class="card">
+                    <div class="card enhanced-card">
                         <div class="card-header">
                             <i class="fas fa-plus-circle me-2"></i>
                             Add Email Recipients
@@ -37,30 +47,59 @@
                             <form id="addRecipientForm">
                                 <div class="mb-3">
                                     <label for="recipientEmail" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="recipientEmail" required>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-envelope"></i>
+                                        </span>
+                                        <input type="email" class="form-control" id="recipientEmail" placeholder="user@example.com" required>
+                                    </div>
                                     <div class="form-text">Enter a valid email address to receive DVIR notifications</div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <label class="form-label">Defect Filter</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="defectFilter" id="newDefectsOnly" value="new" checked>
-                                        <label class="form-check-label" for="newDefectsOnly">
-                                            New Defects Only (Recommended)
-                                        </label>
-                                        <div class="form-text">Only send emails for newly reported defects</div>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="defectFilter" id="allDefects" value="all">
-                                        <label class="form-check-label" for="allDefects">
-                                            All Defects
-                                        </label>
-                                        <div class="form-text">Send emails for all defects, regardless of age</div>
+                                <div class="mb-4">
+                                    <label class="form-label mb-3">Defect Filter Options</label>
+                                    <div class="radio-card-group">
+                                        <div class="radio-card">
+                                            <input class="form-check-input" type="radio" name="defectFilter" id="newDefectsOnly" value="new" checked>
+                                            <label class="radio-card-label" for="newDefectsOnly">
+                                                <div class="radio-card-icon">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </div>
+                                                <div class="radio-card-content">
+                                                    <div class="radio-card-title">New Defects Only</div>
+                                                    <div class="radio-card-subtitle">Recommended - Only new defects</div>
+                                                </div>
+                                                <div class="radio-card-badge">
+                                                    <span class="badge bg-success">Recommended</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="radio-card">
+                                            <input class="form-check-input" type="radio" name="defectFilter" id="allDefects" value="all">
+                                            <label class="radio-card-label" for="allDefects">
+                                                <div class="radio-card-icon">
+                                                    <i class="fas fa-list-alt"></i>
+                                                </div>
+                                                <div class="radio-card-content">
+                                                    <div class="radio-card-title">All Defects</div>
+                                                    <div class="radio-card-subtitle">All defects regardless of age</div>
+                                                </div>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> Add Recipient
+                                <button type="submit" class="btn btn-primary btn-loading" id="addRecipientBtn">
+                                    <span class="btn-text">
+                                        <i class="fas fa-plus me-2"></i>Add Recipient
+                                    </span>
+                                    <span class="btn-loading-text" style="display: none;">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </span>
+                                        Adding...
+                                    </span>
                                 </button>
                             </form>
                         </div>
@@ -69,23 +108,34 @@
 
                 <!-- Current Recipients Section -->
                 <div class="col-lg-6 mb-4">
-                    <div class="card">
+                    <div class="card enhanced-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span>
                                 <i class="fas fa-users me-2"></i>
                                 Current Recipients
-                                <span id="recipientCount" class="badge bg-secondary ms-2">0</span>
+                                <span id="recipientCount" class="badge custom-badge ms-2">0</span>
                             </span>
-                            <button class="btn btn-outline-dark btn-sm" onclick="refreshRecipients()">
-                                <i class="fas fa-sync-alt"></i> Refresh
+                            <button class="btn btn-outline-primary btn-sm btn-loading" id="refreshBtn" onclick="refreshRecipients()">
+                                <span class="btn-text">
+                                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                                </span>
+                                <span class="btn-loading-text" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm me-1" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </span>
+                                    Loading...
+                                </span>
                             </button>
                         </div>
                         <div class="card-body">
                             <div id="recipientsList">
-                                <div class="empty-state">
-                                    <i class="fas fa-inbox"></i>
-                                    <p>No recipients configured</p>
-                                    <small>Add email addresses to start receiving DVIR notifications</small>
+                                <div class="list-loading">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">Loading recipients...</div>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +146,7 @@
             <!-- Status Section -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
+                    <div class="card enhanced-card">
                         <div class="card-header">
                             <i class="fas fa-info-circle me-2"></i>
                             Service Status & Information
@@ -104,22 +154,44 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6>Current Database:</h6>
-                                    <p id="currentDatabase" class="fw-bold text-primary">Loading...</p>
+                                    <div class="status-item">
+                                        <h6 class="status-label">Current Database:</h6>
+                                        <p id="currentDatabase" class="status-value">
+                                            <span class="spinner-border spinner-border-sm me-2" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </span>
+                                            Loading...
+                                        </p>
+                                    </div>
                                     
-                                    <h6>Service Status:</h6>
-                                    <p id="serviceStatus" class="fw-bold">
-                                        <i class="fas fa-circle text-success"></i> Active
-                                    </p>
+                                    <div class="status-item">
+                                        <h6 class="status-label">Service Status:</h6>
+                                        <p class="status-value">
+                                            <i class="fas fa-circle text-success pulse-animation me-2"></i>
+                                            <span class="text-success fw-bold">Active & Running</span>
+                                        </p>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <h6>How it works:</h6>
-                                    <ul class="list-unstyled">
-                                        <li><i class="fas fa-check text-success me-2"></i>Automatic monitoring every 10 minutes</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Sends separate emails per driver</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Includes asset information and location</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Links directly to MyGeotab DVIR</li>
-                                    </ul>
+                                    <h6 class="status-label">How it works:</h6>
+                                    <div class="feature-list">
+                                        <div class="feature-item">
+                                            <i class="fas fa-clock text-primary me-2"></i>
+                                            <span>Automatic monitoring every 10 minutes</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-user text-primary me-2"></i>
+                                            <span>Sends separate emails per driver</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                            <span>Includes asset information and location</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-external-link-alt text-primary me-2"></i>
+                                            <span>Links directly to MyGeotab DVIR</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
