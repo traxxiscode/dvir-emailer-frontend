@@ -216,19 +216,18 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <script>
-        // Firebase configuration (you'll need to replace with your actual config)
         const firebaseConfig = {
-        apiKey: "AIzaSyCdf2Z7hiDj9s30aPxO64gLRVPUvSwQ3CU",
-        authDomain: "dviremailer.firebaseapp.com",
-        projectId: "dviremailer",
-        storageBucket: "dviremailer.firebasestorage.app",
-        messagingSenderId: "34151014900",
-        appId: "1:34151014900:web:3a707cb923a353221219a1"
+            apiKey: "AIzaSyCdf2Z7hiDj9s30aPxO64gLRVPUvSwQ3CU",
+            authDomain: "dviremailer.firebaseapp.com",
+            projectId: "dviremailer",
+            storageBucket: "dviremailer.firebasestorage.app",
+            messagingSenderId: "34151014900",
+            appId: "1:34151014900:web:3a707cb923a353221219a1"
         };
         
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.firestore();
     </script>

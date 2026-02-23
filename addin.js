@@ -37,24 +37,33 @@ geotab.addin.dvirEmailer = function () {
         }
         
         try {
+            await new Promise((resolve, reject) => {
+                firebase.auth().onAuthStateChanged(user => {
+                    if (user) {
+                        resolve(user);
+                    } else {
+                        firebase.auth().signInAnonymously()
+                            .then(resolve)
+                            .catch(reject);
+                    }
+                });
+            });
+
             api.getSession(async function(session) {
                 const databaseName = session.database;
                 currentDatabase = databaseName;
                 
-                // Update UI with current database
                 const dbElement = document.getElementById('currentDatabase');
                 if (dbElement) {
                     dbElement.textContent = databaseName;
                 }
                 
                 if (databaseName && databaseName !== 'demo') {
-                    // Check if database configuration already exists
                     const querySnapshot = await window.db.collection('dvir_configurations')
                         .where('database_name', '==', databaseName)
                         .get();
                     
                     if (querySnapshot.empty) {
-                        // Add new database configuration
                         await window.db.collection('dvir_configurations').add({
                             database_name: databaseName,
                             recipients: [],
