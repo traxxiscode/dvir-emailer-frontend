@@ -49,34 +49,42 @@ geotab.addin.dvirEmailer = function () {
                 });
             });
 
-            api.getSession(async function(session) {
-                const databaseName = session.database;
-                currentDatabase = databaseName;
-                
-                const dbElement = document.getElementById('currentDatabase');
-                if (dbElement) {
-                    dbElement.textContent = databaseName;
-                }
-                
-                if (databaseName && databaseName !== 'demo') {
-                    const querySnapshot = await window.db.collection('dvir_configurations')
-                        .where('database_name', '==', databaseName)
-                        .get();
-                    
-                    if (querySnapshot.empty) {
-                        await window.db.collection('dvir_configurations').add({
-                            database_name: databaseName,
-                            recipients: [],
-                            created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                            updated_at: firebase.firestore.FieldValue.serverTimestamp(),
-                            active: true
-                        });
-                        console.log(`Added database ${databaseName} configuration to Firestore`);
-                    } else {
-                        console.log(`Database ${databaseName} configuration already exists in Firestore`);
+            await new Promise((resolve, reject) => {
+                api.getSession(async function(session) {
+                    try {
+                        const databaseName = session.database;
+                        currentDatabase = databaseName;
+                        
+                        const dbElement = document.getElementById('currentDatabase');
+                        if (dbElement) {
+                            dbElement.textContent = databaseName;
+                        }
+                        
+                        if (databaseName && databaseName !== 'demo') {
+                            const querySnapshot = await window.db.collection('dvir_configurations')
+                                .where('database_name', '==', databaseName)
+                                .get();
+                            
+                            if (querySnapshot.empty) {
+                                await window.db.collection('dvir_configurations').add({
+                                    database_name: databaseName,
+                                    recipients: [],
+                                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                                    updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                                    active: true
+                                });
+                                console.log(`Added database ${databaseName} configuration to Firestore`);
+                            } else {
+                                console.log(`Database ${databaseName} configuration already exists in Firestore`);
+                            }
+                        }
+                        resolve();
+                    } catch (error) {
+                        reject(error);
                     }
-                }
+                });
             });
+
         } catch (error) {
             console.error('Error ensuring database in Firestore:', error);
             showAlert('Error connecting to database: ' + error.message, 'danger');
@@ -414,16 +422,13 @@ geotab.addin.dvirEmailer = function () {
             // Show initial loading
             showInitialLoading();
 
-            // Ensure current database is in Firestore
-            ensureDatabaseInFirestore();
+            // Ensure current database is in Firestore, then load recipients
+            ensureDatabaseInFirestore().then(() => {
+                loadRecipients();
+            });
 
             // Setup event listeners
             setupEventListeners();
-            
-            // Load recipients data
-            setTimeout(() => {
-                loadRecipients();
-            }, 1000); // Give time for database to be set
             
             // Show main content
             if (elAddin) {
