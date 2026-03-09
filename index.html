@@ -11,35 +11,21 @@
 </head>
 <body>
     <div id="dvirEmailer" style="display: none;">
-        <!-- Header -->
-        <div class="custom-header">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <img src="https://cdn.baseline.is/static/content/logos/mDtvptChQ3XwBLuxuu5hip-lala.svg"
-                             alt="Logo" class="header-logo">
-                    </div>
-                    <div class="col">
-                        <div class="header-content">
-                            <h1 class="header-title">DVIR Defect Emailer</h1>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-header-action btn-loading" id="refreshBtn" onclick="refreshRecipients()">
-                            <span class="btn-text">
-                                <i class="fas fa-sync-alt"></i>
-                                <span class="btn-text">Refresh</span>
-                            </span>
-                            <span class="btn-loading-text" style="display: none;">
-                                <span class="spinner-border spinner-border-sm me-1" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </span>
-                                Loading...
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+
+        <!-- Header actions injected into the Geotab dashboard header -->
+        <div data-suite-actions style="display:none;">
+            <button class="btn btn-header-action btn-loading" id="refreshBtn" onclick="refreshRecipients()">
+                <span class="btn-text">
+                    <i class="fas fa-sync-alt"></i>
+                    <span class="btn-label">Refresh</span>
+                </span>
+                <span class="btn-loading-text" style="display: none;">
+                    <span class="spinner-border spinner-border-sm me-1" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </span>
+                    Loading...
+                </span>
+            </button>
         </div>
 
         <!-- Alert Container -->
@@ -76,7 +62,7 @@
                                     </div>
                                     <div class="form-text">Enter a valid email address to receive DVIR Defects</div>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label class="form-label mb-3">Defect Filter Options</label>
                                     <div class="radio-card-group">
@@ -95,7 +81,7 @@
                                                 </div>
                                             </label>
                                         </div>
-                                        
+
                                         <div class="radio-card">
                                             <input class="form-check-input" type="radio" name="defectFilter" id="allDefects" value="all">
                                             <label class="radio-card-label" for="allDefects">
@@ -110,7 +96,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <button type="submit" class="btn btn-primary btn-loading" id="addRecipientBtn">
                                     <span class="btn-text">
                                         <i class="fas fa-plus me-2"></i>Add Recipient
@@ -159,7 +145,7 @@
                     <div class="card enhanced-card">
                         <div class="card-header">
                             <i class="fas fa-info-circle me-2"></i>
-                            Service Status & Information
+                            Service Status &amp; Information
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -173,12 +159,12 @@
                                             Loading...
                                         </p>
                                     </div>
-                                    
+
                                     <div class="status-item">
                                         <h6 class="status-label">Service Status:</h6>
                                         <p class="status-value">
                                             <i class="fas fa-circle text-success pulse-animation me-2"></i>
-                                            <span class="text-success fw-bold">Active & Running</span>
+                                            <span class="text-success fw-bold">Active &amp; Running</span>
                                         </p>
                                     </div>
                                 </div>
@@ -209,10 +195,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div><!-- /#dvirEmailer -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -227,7 +213,7 @@
             messagingSenderId: "34151014900",
             appId: "1:34151014900:web:3a707cb923a353221219a1"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.firestore();
     </script>
